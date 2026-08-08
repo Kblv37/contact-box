@@ -5,6 +5,31 @@ const bcrypt = require('bcryptjs');
 const { getPool, ensureSchema } = require('./db');
 
 const app = express();
+
+// Netlify passes the FULL requested path to the function (e.g. "/api/contacts"
+// or "/.netlify/functions/api/contacts"), unlike the stripped path that
+// local dev / serverless mocks use. Normalize it so routes match regardless.
+app.use((req, res, next) => {
+  const qIdx = req.url.indexOf('?');
+  const query = qIdx >= 0 ? req.url.slice(qIdx) : '';
+  let path = qIdx >= 0 ? req.url.slice(0, qIdx) : req.url;
+
+  // Strip the full Netlify function base (direct hits) first.
+  const fnMatch = path.match(/^(?:\/)?\.netlify\/functions\/api(?:\/(.*))?$/);
+  if (fnMatch) {
+    path = fnMatch[1] || '';
+  } else if (/^\/api(?:\/|$)/.test(path)) {
+    // Or the /api/* prefix when the redirect rewrote to the function.
+    path = path.replace(/^\/api/, '');
+  }
+  if (!path.startsWith('/')) path = '/' + path;
+  if (path === '/') path = '';
+
+  req.url = (path || '/') + query;
+  req.originalUrl = req.url;
+  next();
+});
+
 app.use(express.json());
 
 // Make sure users/contacts tables exist before the first request touches them.

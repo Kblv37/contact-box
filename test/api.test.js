@@ -240,4 +240,36 @@ describe('Contacts API (authenticated, per-user)', () => {
     const res = await request(server, 'DELETE', '/contacts/99999', undefined, token);
     assert.equal(res.status, 404);
   });
+
+  describe('Netlify path normalization (real request paths)', () => {
+    it('serves /api/... with the /api prefix (redirect path form)', async () => {
+      const list = await request(server, 'GET', '/api/contacts', undefined, token);
+      assert.equal(list.status, 200);
+      assert.ok(Array.isArray(await list.json()));
+
+      const reg = await request(server, 'POST', '/api/auth/register', {
+        name: 'ViaPrefix', email: 'prefix@example.com', password: 'secret12',
+      });
+      assert.equal(reg.status, 201);
+      const body = await reg.json();
+      assert.ok(body.token);
+    });
+
+    it('serves /.netlify/functions/api/... (direct function hit)', async () => {
+      const res = await request(server, 'GET', '/.netlify/functions/api/contacts', undefined, token);
+      assert.equal(res.status, 200);
+      assert.ok(Array.isArray(await res.json()));
+    });
+
+    it('keeps query strings working on prefixed paths', async () => {
+      await request(server, 'POST', '/api/contacts', {
+        name: 'SearchMe', phone: '999-555-1111', note: 'needle',
+      }, token);
+      const res = await request(server, 'GET', '/api/contacts?q=needle', undefined, token);
+      assert.equal(res.status, 200);
+      const rows = await res.json();
+      assert.equal(rows.length, 1);
+      assert.equal(rows[0].name, 'SearchMe');
+    });
+  });
 });
