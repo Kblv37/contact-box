@@ -373,17 +373,24 @@ body {
 .empty-state span { font-size: 0.9rem; }
 
 /* ---------- Modal ---------- */
+/* Modals are CLOSED by default (display:none). They become visible only via
+   the .open class added by JS. No reliance on the hidden attribute alone,
+   so a mismatch can never leave a modal blocking the page on load. */
 .modal {
   position: fixed;
   inset: 0;
   z-index: 50;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 16px;
 }
 
-/* Keep hidden attribute effective — display:flex above must not leak */
+.modal.open {
+  display: flex;
+}
+
+/* Defensive: keep hidden attribute respected regardless of other rules */
 .modal[hidden] {
   display: none !important;
 }

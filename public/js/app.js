@@ -277,7 +277,7 @@
     clearErrors();
     modalTitle.textContent = 'Add contact';
     saveBtn.textContent = 'Add';
-    modal.hidden = false;
+    openModal(modal);
     setTimeout(() => document.getElementById('name').focus(), 50);
   }
 
@@ -290,11 +290,17 @@
     clearErrors();
     modalTitle.textContent = 'Edit contact';
     saveBtn.textContent = 'Save';
-    modal.hidden = false;
+    openModal(modal);
     setTimeout(() => document.getElementById('name').focus(), 50);
   }
 
+  function openModal(el) {
+    el.hidden = false;
+    el.classList.add('open');
+  }
+
   function closeModal(el) {
+    el.classList.remove('open');
     el.hidden = true;
   }
 
@@ -349,7 +355,7 @@
   function askDelete(contact) {
     pendingDelete = contact;
     confirmText.textContent = `Delete "${contact.name}"? This cannot be undone.`;
-    confirmModal.hidden = false;
+    openModal(confirmModal);
   }
 
   async function doDelete() {
@@ -420,7 +426,20 @@
   });
 
   // ---------- init ----------
+  // Guarantee a closed, non-blocking UI state on every page load:
+  // modals are force-closed regardless of markup or cached CSS.
+  function forceCloseModals() {
+    closeModal(modal);
+    closeModal(confirmModal);
+  }
+
+  function showStartupView() {
+    appView.hidden = true;
+    authView.hidden = false;
+  }
+
   async function init() {
+    forceCloseModals();
     if (token) {
       try {
         currentUser = await getJSON('/auth/me');
@@ -431,7 +450,7 @@
         localStorage.removeItem(TOKEN_KEY);
       }
     }
-    showAuth();
+    showStartupView();
   }
 
   init();
