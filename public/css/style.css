@@ -45,7 +45,31 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
 }
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.user-email {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: none;
+}
+
+.btn-light {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+.btn-light:hover { background: rgba(255, 255, 255, 0.26); }
 
 .logo {
   font-size: 1.15rem;
@@ -53,6 +77,95 @@ body {
   margin: 0;
   letter-spacing: -0.01em;
 }
+
+/* ---------- Auth view ---------- */
+.auth-view {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--surface);
+  border: 1px solid var(--border-bg);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  padding: 28px 24px;
+  margin: auto;
+}
+
+.auth-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--primary);
+}
+
+.auth-sub {
+  margin: 0 0 18px;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.auth-tabs {
+  display: flex;
+  background: #eff2f7;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 18px;
+  gap: 4px;
+}
+
+.auth-tab {
+  flex: 1;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 8px 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.auth-tab.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.auth-error {
+  margin: 4px 0 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fdecea;
+  color: #b71c1c;
+  font-size: 0.88rem;
+}
+
+.btn-block {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.auth-switch {
+  display: block;
+  margin: 16px auto 0;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+}
+.auth-switch strong { color: var(--primary); }
 
 /* ---------- Layout ---------- */
 .container {
@@ -270,6 +383,11 @@ body {
   padding: 16px;
 }
 
+/* Keep hidden attribute effective — display:flex above must not leak */
+.modal[hidden] {
+  display: none !important;
+}
+
 .modal-backdrop {
   position: absolute;
   inset: 0;
@@ -362,6 +480,7 @@ body {
   .container { padding: 24px 16px; }
   .header-inner { padding: 14px 16px; }
   .logo { font-size: 1.25rem; }
+  .user-email { display: inline; }
 }
 
 /* ---------- Animations ---------- */

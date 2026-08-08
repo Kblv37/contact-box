@@ -9,11 +9,19 @@ function getPool() {
       const { newDb } = require('pg-mem');
       const memDb = newDb({ autoCreateForeignKeyIndices: true });
       memDb.public.none(`
-        CREATE TABLE contacts (
+        CREATE TABLE IF NOT EXISTS users (
+          id            BIGSERIAL PRIMARY KEY,
+          name          TEXT     NOT NULL DEFAULT '',
+          email         TEXT     NOT NULL UNIQUE,
+          password_hash TEXT     NOT NULL,
+          created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+        CREATE TABLE IF NOT EXISTS contacts (
           id         BIGSERIAL PRIMARY KEY,
-          name       TEXT      NOT NULL,
-          phone      TEXT      NOT NULL,
-          note       TEXT      NOT NULL DEFAULT '',
+          user_id    BIGINT   NOT NULL,
+          name       TEXT     NOT NULL,
+          phone      TEXT     NOT NULL,
+          note       TEXT     NOT NULL DEFAULT '',
           created_at TIMESTAMPTZ NOT NULL DEFAULT now()
         );
       `);

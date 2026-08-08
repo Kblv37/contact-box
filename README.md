@@ -4,12 +4,15 @@
 
 ## Возможности
 
+- Регистрация и вход по email + паролю (JWT-токен, bcrypt-хэш пароля).
+- Контакты изолированы по пользователям.
 - Добавление контакта: имя, телефон, заметка (дата создания ставится автоматически).
 - Список всех контактов (сортировка: новые сверху).
 - Живой поиск по имени, номеру и заметке.
 - Редактирование и удаление контактов (с подтверждением удаления).
 - Mobile-first адаптивный интерфейс, чистый UI без сторонних библиотек.
 - Валидация данных на клиенте и на сервере + понятные сообщения об ошибках.
+- Логика авторизации: кабинет «мой аккаунт», выход из аккаунта.
 
 ## Структура проекта
 
@@ -33,9 +36,20 @@ contact-manager/
 
 ## REST API
 
+### Аутентификация
+
+| Метод | Endpoint             | Описание                                       |
+|-------|----------------------|------------------------------------------------|
+| POST  | `/api/auth/register` | Регистрация: `name` (необязательно), `email`, `password` (≥6 символов). Возвращает `{ token, user }` |
+| POST  | `/api/auth/login`    | Вход: `email`, `password`. Возвращает `{ token, user }` |
+| GET   | `/api/auth/me`       | Текущий пользователь (нужен `Authorization: Bearer <token>`) |
+| POST  | `/api/auth/logout`   | 204 (клиент удаляет токен)                     |
+
+### Контакты (все require `Authorization: Bearer <token>`)
+
 | Метод   | Endpoint             | Описание                            |
 |---------|----------------------|--------------------------------------|
-| GET     | `/api/contacts`       | Список всех контактов                |
+| GET     | `/api/contacts`       | Список контактов текущего пользователя |
 | GET     | `/api/contacts?q=…`  | Поиск по имени / телефону / заметке |
 | GET     | `/api/contacts/:id`  | Один контакт                          |
 | POST    | `/api/contacts`       | Создать контакт                        |
@@ -43,14 +57,18 @@ contact-manager/
 | PATCH   | `/api/contacts/:id`   | Частичное обновление                   |
 | DELETE  | `/api/contacts/:id`   | Удалить контакт (204)                  |
 
-Пример создания:
+Пример создания контакта:
 
 ```http
 POST /api/contacts
+Authorization: Bearer <token>
 Content-Type: application/json
 
 { "name": "Alice", "phone": "+1 555 010 2233", "note": "Work" }
 ```
+
+Обратите внимание: `/api/contacts/*` доступны только авторизованным пользователям.
+Просмотр/редактирование чужих контактов возвращает `404`.
 
 ## Настройка базы данных (Neon)
 
@@ -65,7 +83,7 @@ Content-Type: application/json
 ### Локальный запуск
 
 ```bash
-cp .env.example .env          # впишите в DATABASE_URL свой connection string
+cp .env.example .env          # впишите DATABASE_URL и JWT_SECRET
 npm install
 npm run dev                   # или: node serve-local.js
 ```
@@ -88,9 +106,10 @@ npm run dev                   # или: node serve-local.js
    - **Build command:** `npm run build`
    - **Publish directory:** `public`
    - Важно: установите Node 18+ (Netlify по умолчанию использует актуальный LTS).
-4. Добавьте переменную окружения:
-   - **Key:** `DATABASE_URL`
-   - **Value:** ваш Neon connection string (с `?sslmode=require`)
+4. Добавьте переменные окружения:
+   - **Key:** `DATABASE_URL` — ваш Neon connection string (с `?sslmode=require`)
+   - **Key:** `JWT_SECRET` — длинная случайная строка. Сгенерировать:
+     `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`
 5. Нажмите **Deploy site**.
 
 ### Через Netlify CLI
@@ -106,6 +125,7 @@ netlify deploy --prod
 
 ```bash
 netlify env:set DATABASE_URL "postgresql://user:pass@ep-xxx.aws.neon.tech/neondb?sslmode=require"
+netlify env:set JWT_SECRET "$(node -e "console.log(require('crypto').randomBytes(48).toString('hex'))")"
 ```
 
 ### Как устроен бэкенд на Netlify
@@ -121,5 +141,8 @@ netlify env:set DATABASE_URL "postgresql://user:pass@ep-xxx.aws.neon.tech/neondb
 
 - Пул соединений PostgreSQL переиспользуется между вызовами функции (одна воркер/инстанс
   держит один пул).
-- Секреты (`DATABASE_URL`) никогда не кладите в репозиторий — только в переменные
-  окружения Netlify / локальный `.env`.
+- Секреты (`DATABASE_URL`, `JWT_SECRET`) никогда не кладите в репозиторий — только в
+  переменные окружения Netlify / локальный `.env`.
+- Пароли хэшируются через `bcryptjs`; токены JWT живут 7 дней.
+- Локально без реальной БД можно запустить `PG_MEM=1 node serve-local.js`
+  (in-memory PostgreSQL через `pg-mem`).
