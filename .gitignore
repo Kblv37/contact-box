@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.local
+.netlify/
+functions/.netlify/
+netlify/functions/.netlify/
+netlify/functions/data/**
+*.log
+.DS_Store
+
+# Деплой-инструкция для Netlify (локальный файл, не коммитится)
+DEPLOY.md

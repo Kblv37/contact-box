@@ -1,0 +1,25 @@
+{
+  "name": "contact-manager",
+  "version": "1.0.0",
+  "description": "Minimal full-stack contact manager: HTML + CSS + Vanilla JS frontend, Netlify Functions + Express + Neon/PostgreSQL backend.",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "netlify functions:serve",
+    "dev": "netlify dev",
+    "build": "node scripts/prepare.js",
+    "test": "node --test test/api.test.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.12.0",
+    "serverless-http": "^3.2.0"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^2.8.0",
+    "netlify-cli": "^17.33.1",
+    "pg-mem": "^3.0.14"
+  }
+}

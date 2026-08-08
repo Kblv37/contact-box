@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1e88e5" />
+  <title>Contact Manager</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%231e88e5'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-family='Arial'>@</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <h1 class="logo">Contact Manager</h1>
+      <button id="addBtn" class="btn btn-primary btn-icon" aria-label="Add contact">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+        <span>Add</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="toolbar" aria-label="Search contacts">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path fill="currentColor" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/>
+        </svg>
+        <input id="searchInput" type="search" placeholder="Search by name, phone or note…" autocomplete="off" />
+      </div>
+      <span id="count" class="count"></span>
+    </section>
+
+    <section id="status" class="status" role="status" aria-live="polite"></section>
+
+    <div id="emptyState" class="empty-state" hidden>
+      <div class="empty-icon">👤</div>
+      <p>No contacts yet</p>
+      <span>Tap <strong>Add</strong> to create your first contact.</span>
+    </div>
+
+    <div id="noResults" class="empty-state" hidden>
+      <div class="empty-icon">🔍</div>
+      <p>Nothing found</p>
+      <span>Try a different search term.</span>
+    </div>
+
+    <ul id="contactList" class="contact-list"></ul>
+  </main>
+
+  <!-- Add / Edit modal -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <h2 id="modalTitle">Add contact</h2>
+        <button id="closeModal" class="btn btn-ghost icon-btn" aria-label="Close" data-close>
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+        </button>
+      </div>
+
+      <form id="contactForm" novalidate>
+        <input type="hidden" id="contactId" />
+        <label class="field">
+          <span class="field-label">Name <em>*</em></span>
+          <input id="name" name="name" type="text" maxlength="200" placeholder="e.g. Alice Smith" required />
+          <span class="field-error" data-error-for="name"></span>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Phone <em>*</em></span>
+          <input id="phone" name="phone" type="tel" maxlength="20" placeholder="e.g. +1 555 010 2233" required />
+          <span class="field-error" data-error-for="phone"></span>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Note</span>
+          <textarea id="note" name="note" rows="3" maxlength="1000" placeholder="Anything to remember…"></textarea>
+        </label>
+
+        <div class="modal-actions">
+          <button type="button" id="cancelBtn" class="btn btn-ghost" data-close>Cancel</button>
+          <button type="submit" id="saveBtn" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete confirmation -->
+  <div id="confirmModal" class="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card modal-card--sm" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="modal-head">
+        <h2 id="confirmTitle">Delete contact</h2>
+        <button class="btn btn-ghost icon-btn" aria-label="Close" data-close>
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+        </button>
+      </div>
+      <p class="confirm-text" id="confirmText">Delete this contact?</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
