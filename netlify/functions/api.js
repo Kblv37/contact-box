@@ -2,10 +2,20 @@ const express = require('express');
 const serverless = require('serverless-http');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { getPool } = require('./db');
+const { getPool, ensureSchema } = require('./db');
 
 const app = express();
 app.use(express.json());
+
+// Make sure users/contacts tables exist before the first request touches them.
+app.use(async (req, res, next) => {
+  try {
+    await ensureSchema();
+  } catch (_) {
+    /* express error handler will surface any real DB errors */
+  }
+  next();
+});
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production';
 const phonePattern = /^\+?[0-9()\-\s.]{6,20}$/;

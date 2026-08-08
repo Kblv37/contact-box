@@ -5,6 +5,7 @@
 ## Возможности
 
 - Регистрация и вход по email + паролю (JWT-токен, bcrypt-хэш пароля).
+- Кнопка «показать/скрыть пароль» при регистрации и входе.
 - Контакты изолированы по пользователям.
 - Добавление контакта: имя, телефон, заметка (дата создания ставится автоматически).
 - Список всех контактов (сортировка: новые сверху).
@@ -21,12 +22,17 @@ contact-manager/
 ├── public/                    # Frontend (статика)
 │   ├── index.html
 │   ├── css/style.css
-│   └── js/app.js
+│   └── js/
+│       ├── api.js             # fetch-обёртка + сессия (токен)
+│       ├── ui.js              # helpers: модалки, статусы, форматирование
+│       ├── auth.js            # логин / регистрация, показ пароля
+│       ├── contacts.js        # список контактов, поиск, CRUD
+│       └── app.js             # bootstrap: выбор начального экрана
 ├── netlify/
 │   └── functions/             # Backend как Netlify Functions
 │       ├── api.js             # Express-приложение (REST API)
-│       └── db.js              # Пул соединений PostgreSQL (pg)
-├── sql/schema.sql             # Схема таблицы contacts
+│       └── db.js              # Пул PostgreSQL (pg) + автосоздание схемы
+├── sql/schema.sql             # Схема (users + contacts)
 ├── netlify.toml               # Конфигурация Netlify
 ├── serve-local.js             # Локальный dev-сервер (Express + статика)
 ├── .env.example
@@ -77,8 +83,10 @@ Content-Type: application/json
    ```
    postgresql://user:password@ep-xxxx.region.aws.neon.tech/neondb?sslmode=require
    ```
-3. Создайте таблицу. Откройте в Neon вкладку **SQL Editor** и выполните содержимое
+3. Создайте таблицы. Откройте в Neon вкладку **SQL Editor** и выполните содержимое
    [`sql/schema.sql`](sql/schema.sql) (или выполните через `psql`).
+   Не обязательно: при первом подключении API сам создаёт таблицы
+   (idempotent `CREATE TABLE IF NOT EXISTS` / `ADD COLUMN IF NOT EXISTS`).
 
 ### Локальный запуск
 
