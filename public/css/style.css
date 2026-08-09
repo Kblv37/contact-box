@@ -140,15 +140,6 @@ body {
   box-shadow: var(--shadow);
 }
 
-.auth-error {
-  margin: 4px 0 12px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: #fdecea;
-  color: #b71c1c;
-  font-size: 0.88rem;
-}
-
 .btn-block {
   width: 100%;
   margin-top: 6px;
@@ -269,17 +260,33 @@ body {
   white-space: nowrap;
 }
 
-/* ---------- Status ---------- */
-.status {
-  padding: 10px 14px;
-  border-radius: 10px;
+/* ---------- Toast (fixed, pops over the whole page) ---------- */
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%) translateY(16px);
+  z-index: 120;
+  max-width: min(90vw, 440px);
+  width: max-content;
+  padding: 12px 18px;
+  border-radius: 12px;
   font-size: 0.9rem;
-  margin-bottom: 12px;
-  display: none;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #fff;
+  background: #374151;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
-.status.show { display: block; }
-.status.success { background: #e8f5e9; color: #1b5e20; }
-.status.error { background: #fdecea; color: #b71c1c; }
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+#toast.success { background: #2e7d32; }
+#toast.error { background: #c62828; }
 
 /* ---------- Contact list ---------- */
 .contact-list {
@@ -348,6 +355,31 @@ body {
   word-break: break-word;
 }
 
+.meta-icon {
+  display: inline-flex;
+  align-items: center;
+  color: #8a93a1;
+  margin-top: 2px;
+}
+.meta-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.contact-phone {
+  cursor: pointer;
+  color: var(--text);
+  text-decoration: underline dotted rgba(0, 0, 0, 0.35);
+  text-underline-offset: 3px;
+  -webkit-tap-highlight-color: transparent;
+}
+.contact-phone:hover { color: var(--primary); }
+.contact-phone:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .contact-date {
   display: block;
   margin-top: 6px;
@@ -368,7 +400,15 @@ body {
   padding: 48px 16px;
   color: var(--text-muted);
 }
-.empty-state .empty-icon { font-size: 2.6rem; }
+.empty-state .empty-icon {
+  color: #aab4c0;
+  display: flex;
+  justify-content: center;
+}
+.empty-state .empty-icon svg {
+  width: 56px;
+  height: 56px;
+}
 .empty-state p { font-weight: 600; color: var(--text); margin: 10px 0 4px; }
 .empty-state span { font-size: 0.9rem; }
 
@@ -390,7 +430,12 @@ body {
   display: flex;
 }
 
-/* Defensive: keep hidden attribute respected regardless of other rules */
+/* Defensive: keep the hidden attribute respected regardless of other rules
+   (e.g. .auth-view uses display:flex, which used to override HTML hidden).
+   Without this the login form stays visible under the app after login. */
+[hidden] {
+  display: none !important;
+}
 .modal[hidden] {
   display: none !important;
 }

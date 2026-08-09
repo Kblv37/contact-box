@@ -32,16 +32,52 @@
     );
   };
 
-  // Transient toast-like status line inside the app header area.
-  let statusTimer = null;
-  App.showStatus = (message, type) => {
-    const el = $('status');
-    if (!el) return;
+  // Global toast: a small floating notification (top vanishes, bottom shows)
+  // used for transient messages (errors, confirmations). Auto-dismisses.
+  let toastTimer = null;
+  App.toast = (message, type) => {
+    let el = document.getElementById('toast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'toast';
+      el.setAttribute('role', 'status');
+      el.setAttribute('aria-live', 'polite');
+      document.body.appendChild(el);
+    }
     el.textContent = message;
-    el.className = 'status show ' + (type || 'success');
-    clearTimeout(statusTimer);
-    statusTimer = setTimeout(() => el.classList.remove('show'), 3500);
+    el.className = 'show ' + (type || 'success');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.className = ''; }, 3600);
   };
+
+  // Copy text to the clipboard (works over https and localhost, with a
+  // legacy execCommand fallback for other contexts).
+  App.copyText = (text) => {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(String(text));
+    }
+    return new Promise((resolve, reject) => {
+      const ta = document.createElement('textarea');
+      ta.value = String(text);
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch (err) {
+        return reject(err);
+      } finally {
+        ta.remove();
+      }
+      ok ? resolve() : reject(new Error('Copy failed'));
+    });
+  };
+
+  // Backwards-compatible alias.
+  App.showStatus = App.toast;
 
   App.openModal = (el) => {
     el.hidden = false;

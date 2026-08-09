@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=91c0add63a" />
+  <link rel="stylesheet" href="css/style.css?v=66eaf80616" />
 </head>
 <body>
   <!-- ============ AUTH VIEW ============ -->
@@ -49,8 +49,6 @@
           </span>
         </label>
 
-        <div id="authError" class="auth-error" hidden></div>
-
         <button id="authSubmit" type="submit" class="btn btn-primary btn-block">Log in</button>
       </form>
 
@@ -87,16 +85,18 @@
         <span id="count" class="count"></span>
       </section>
 
-      <section id="status" class="status" role="status" aria-live="polite"></section>
-
       <div id="emptyState" class="empty-state" hidden>
-        <div class="empty-icon">👤</div>
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
         <p>No contacts yet</p>
         <span>Tap <strong>Add</strong> to create your first contact.</span>
       </div>
 
       <div id="noResults" class="empty-state" hidden>
-        <div class="empty-icon">🔍</div>
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
+        </div>
         <p>Nothing found</p>
         <span>Try a different search term.</span>
       </div>
@@ -128,7 +128,7 @@
 
         <label class="field">
           <span class="field-label">Phone <em>*</em></span>
-          <input id="phone" name="phone" type="tel" maxlength="20" placeholder="e.g. +1 555 010 2233" required />
+          <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="e.g. +1 555 010 2233" required />
           <span class="field-error" data-error-for="phone"></span>
         </label>
 
@@ -166,9 +166,9 @@
   </div>
 
   <script src="js/api.js?v=115009a540"></script>
-  <script src="js/ui.js?v=4461ae4fa6"></script>
-  <script src="js/auth.js?v=37d278bc38"></script>
-  <script src="js/contacts.js?v=c2905e71ce"></script>
+  <script src="js/ui.js?v=c03fa920bd"></script>
+  <script src="js/auth.js?v=a3ac95de62"></script>
+  <script src="js/contacts.js?v=9cea2ae775"></script>
   <script src="js/app.js?v=2282e14331"></script>
 </body>
 </html>

@@ -55,8 +55,8 @@
         <div class="contact-body">
           <p class="contact-name">${name}</p>
           <ul class="contact-meta">
-            <li><span class="meta-icon">📞</span> <span>${phone}</span></li>
-            ${note ? `<li><span class="meta-icon">📝</span> <span>${note}</span></li>` : ''}
+            <li><span class="meta-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.15 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></span> <span class="contact-phone" data-copy role="button" tabindex="0" aria-label="Copy phone number">${phone}</span></li>
+            ${note ? `<li><span class="meta-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg></span> <span>${note}</span></li>` : ''}
           </ul>
           <span class="contact-date">${date}</span>
         </div>
@@ -85,7 +85,7 @@
     } catch (err) {
       state.contacts = [];
       render();
-      App.showStatus('Failed to load contacts: ' + err.message, 'error');
+      App.toast('Failed to load contacts: ' + err.message, 'error');
     }
   }
 
@@ -135,10 +135,10 @@
     try {
       if (isEdit) {
         await App.sendJSON('/contacts/' + editingId, 'PUT', payload);
-        App.showStatus('Contact updated', 'success');
+        App.toast('Contact updated', 'success');
       } else {
         await App.sendJSON('/contacts', 'POST', payload);
-        App.showStatus('Contact added', 'success');
+        App.toast('Contact added', 'success');
       }
       App.closeModal(modal);
       await load();
@@ -146,7 +146,7 @@
       if (err.details) {
         for (const key of Object.keys(err.details)) App.setFieldError(key, err.details[key]);
       }
-      App.showStatus('Failed: ' + err.message, 'error');
+      App.toast('Failed: ' + err.message, 'error');
     }
   }
 
@@ -164,11 +164,11 @@
     try {
       await App.sendJSON('/contacts/' + contact.id, 'DELETE');
       App.closeModal(confirmModal);
-      App.showStatus('Contact deleted', 'success');
+      App.toast('Contact deleted', 'success');
       await load();
     } catch (err) {
       App.closeModal(confirmModal);
-      App.showStatus('Failed to delete: ' + err.message, 'error');
+      App.toast('Failed to delete: ' + err.message, 'error');
     }
   }
 
@@ -177,6 +177,14 @@
 
   // ---------- wire up ----------
   contactList.addEventListener('click', (e) => {
+    const copyEl = e.target.closest('[data-copy]');
+    if (copyEl) {
+      App.copyText(copyEl.textContent.trim())
+        .then(() => App.toast('Phone number copied', 'success'))
+        .catch(() => App.toast('Could not copy phone number', 'error'));
+      return;
+    }
+
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
     const li = btn.closest('.contact-card');

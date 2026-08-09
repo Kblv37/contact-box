@@ -14,7 +14,6 @@
   const authName = $('authName');
   const authEmail = $('authEmail');
   const authPassword = $('authPassword');
-  const authError = $('authError');
   const authSubmit = $('authSubmit');
   const authSwitch = $('authSwitch');
   const authTabLogin = $('authTabLogin');
@@ -70,13 +69,11 @@
   }
 
   function setAuthError(message) {
-    authError.textContent = message;
-    authError.hidden = false;
+    App.toast(message, 'error');
   }
 
   function clearAuthError() {
-    authError.textContent = '';
-    authError.hidden = true;
+    // Toasts auto-dismiss; nothing to clear.
   }
 
   async function handleSubmit(e) {
