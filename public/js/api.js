@@ -38,12 +38,19 @@
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     if (token) headers['Authorization'] = 'Bearer ' + token;
 
+    // Abort stalled requests instead of leaving the UI frozen with no feedback
+    // (e.g. slow custom-domain/Cloudflare round-trips).
+    const controller = 'AbortController' in window ? new AbortController() : null;
+    const timer = controller ? setTimeout(() => controller.abort(), 30000) : null;
+
     return fetch(API_BASE + path, {
       method,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
+      signal: controller ? controller.signal : undefined,
     })
       .then(async (res) => {
+        if (timer) clearTimeout(timer);
         const text = await res.text();
         let data = null;
         if (text) {
@@ -71,6 +78,10 @@
         return data;
       })
       .catch((err) => {
+        if (timer) clearTimeout(timer);
+        if (err && err.name === 'AbortError') {
+          throw new Error('The request took too long — please try again.');
+        }
         if (err instanceof TypeError) {
           throw new Error('Network error — is the server running?');
         }

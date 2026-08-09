@@ -25,8 +25,27 @@
 
   // ---------- view switching ----------
   function showAuthView() {
+    resetAuthForm();
     appView.hidden = true;
     authView.hidden = false;
+  }
+
+  // Always return to a clean, predictable LOGIN form (e.g. on logout, init).
+  // Otherwise the mode/tab can be left in 'register' state and the submit
+  // button would re-register instead of logging in.
+  function resetAuthForm() {
+    setAuthMode('login');
+    clearAuthError();
+    authName.value = '';
+    authEmail.value = '';
+    authPassword.value = '';
+    authSubmit.disabled = false;
+    if (pwToggle) {
+      authPassword.type = 'password';
+      pwToggle.classList.remove('is-visible');
+      pwToggle.setAttribute('aria-pressed', 'false');
+      pwToggle.setAttribute('aria-label', 'Show password');
+    }
   }
 
   function showAppView() {
@@ -79,6 +98,8 @@
     }
 
     authSubmit.disabled = true;
+    const busyText = authSubmit.textContent;
+    authSubmit.textContent = mode === 'register' ? 'Creating account…' : 'Signing in…';
     try {
       const data =
         mode === 'register'
@@ -86,12 +107,14 @@
           : await App.sendJSON('/auth/login', 'POST', { email, password });
 
       App.setSession(data);
+      resetAuthForm();
       showAppView();
     } catch (err) {
       const msg = err.details ? Object.values(err.details).join(' ') : err.message;
       setAuthError(msg);
     } finally {
       authSubmit.disabled = false;
+      authSubmit.textContent = busyText;
     }
   }
 
