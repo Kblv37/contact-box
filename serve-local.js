@@ -6,6 +6,10 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const { app } = require('./netlify/functions/api');
+const fingerprint = require('./scripts/prepare');
+
+// Keep local assets fingerprinted exactly like a Netlify build would.
+fingerprint();
 
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const PORT = process.env.PORT || 3000;
