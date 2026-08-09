@@ -20,15 +20,13 @@ const MIME = {
   '.ico': 'image/x-icon',
 };
 
-// Serves /api/* through Express and everything else from public/
+// Local mirror of Netlify: forward both public API paths to Express.
+// Netlify invokes the function with a full prefixed path; the Express app in
+// netlify/functions/api.js normalizes the prefix itself, so here we forward
+// the request VERBATIM (no manual strip) — exactly like the deployed behavior.
 const server = http.createServer((req, res) => {
-  if (req.url.startsWith('/api')) {
-    // Local mirror of Netlify: the function receives the path without the
-    // "/api" or function prefix, so strip it before handing off to Express.
-    const stripped = req.url.replace(/^\/api/, '') || '/';
-    req.url = stripped;
-    req.originalUrl = stripped;
-    req.path = stripped;
+  const isApi = req.url.startsWith('/api') || req.url.startsWith('/.netlify/functions/api');
+  if (isApi) {
     return app(req, res);
   }
   let pathname = decodeURIComponent(req.url.split('?')[0] || '/');

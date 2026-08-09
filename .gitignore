@@ -10,3 +10,4 @@ netlify/functions/data/**
 
 # Деплой-инструкция для Netlify (локальный файл, не коммитится)
 DEPLOY.md
+NETLIFY_VERIFY.md

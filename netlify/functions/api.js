@@ -156,6 +156,29 @@ app.post('/auth/logout', (req, res) => {
   res.status(204).end();
 });
 
+// ---------- health (diagnostics for Netlify / Neon verification) ----------
+app.get('/health', asyncHandler(async (req, res) => {
+  const pool = getPool();
+  let db;
+  try {
+    const { rows } = await pool.query(
+      `SELECT (SELECT COUNT(*) FROM users) AS users,
+              (SELECT COUNT(*) FROM contacts) AS contacts`
+    );
+    db = { ok: true, users: Number(rows[0].users), contacts: Number(rows[0].contacts) };
+  } catch (err) {
+    db = { ok: false, error: err.message };
+  }
+  res.status(db.ok ? 200 : 503).json({
+    ok: db.ok,
+    service: 'ContactBox API',
+    db,
+    secret: process.env.JWT_SECRET ? 'configured' : 'fallback (dev)',
+    runtime: 'netlify-function',
+    time: new Date().toISOString(),
+  });
+}));
+
 // ---------- contacts (auth required, scoped to the user) ----------
 const contactsRouter = express.Router();
 contactsRouter.use(authRequired);

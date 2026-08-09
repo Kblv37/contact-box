@@ -5,7 +5,15 @@
 [functions]
   directory = "netlify/functions"
 
+# API follows the public redirect.
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
   status = 200
+
+# Force the browser to revalidate all assets on every visit, so a freshly
+# deployed fix can never be "stuck" behind an old cached copy.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

@@ -28,6 +28,15 @@ describe('Auth', () => {
   before(async () => { server = await listen(app); });
   after(() => server.close());
 
+  it('returns healthy status from /api/health', async () => {
+    const res = await request(server, 'GET', '/api/health');
+    assert.equal(res.status, 200);
+    const body = await res.json();
+    assert.equal(body.ok, true);
+    assert.equal(body.service, 'ContactBox API');
+    assert.equal(body.db.ok, true);
+  });
+
   it('registers a user and returns a token', async () => {
     const res = await request(server, 'POST', '/auth/register', {
       name: 'Alice',
